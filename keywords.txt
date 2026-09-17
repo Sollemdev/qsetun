@@ -17,10 +17,12 @@ QState	KEYWORD1
 begin	KEYWORD2
 feed	KEYWORD2
 reset	KEYWORD2
+calibrate	KEYWORD2
 setThresholds	KEYWORD2
 getBaseline	KEYWORD2
 isAnomaly	KEYWORD2
 getScore	KEYWORD2
+getScorePct	KEYWORD2
 getCyclesCount	KEYWORD2
 
 #######################################
@@ -31,7 +33,9 @@ Negative	LITERAL1
 Zero	LITERAL1
 Positive	LITERAL1
 is_anomaly	LITERAL1
+beat_classified	LITERAL1
 anomaly_score	LITERAL1
+anomaly_score_pct	LITERAL1
 charge	LITERAL1
 cycle_width	LITERAL1
 noise_annihilated	LITERAL1

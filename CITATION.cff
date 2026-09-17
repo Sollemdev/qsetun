@@ -8,7 +8,7 @@ authors:
     given-names: "Architecture Co-Author"
     affiliation: "Noosphere Research Lab"
 title: "Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis for Edge AI"
-version: 1.0.1
+version: 2.0.0
 doi: 10.5281/zenodo.22813548
 date-released: 2026-09-17
 url: "https://github.com/Sollemdev/qsetun"

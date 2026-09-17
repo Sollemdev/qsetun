@@ -60,6 +60,12 @@ All physical benchmarks were compiled using actual target cross-compilers (`avr-
 | **AAMI EC57 F1-Score** | **1.0000** | 0.9120 | 0.9250 | 0.9300 | **Topological Robustness** |
 | **Arithmetic Type** | **Integer Fixed-Point (Q8)** | Float32 / Int8 Quantized | Int8 Quantized | Int8 Quantized | **Zero-FLOP** |
 
+> **Data Provenance Disclosures:**
+> 1. **ESP32 Metrics (Q-SETUN vs TFLite Micro):** Measured directly on physical silicon (`ESP32-D0WDQ6-V3` 240 MHz) via hardware timer `esp_timer_get_time()` and continuous UART telemetry streaming over COM3 (see raw logs in [`esp32_cardiac_telemetry.jsonl`](file:///D:/Noosphere/showcases/CARDIAC_QUBIT_ESP32/04_TELEMETRY_LOGS_AND_BENCHMARKS/esp32_cardiac_telemetry.jsonl)).
+> 2. **AVR ATmega328P Metrics:** Measured directly from the output of the official Atmel cross-compiler `avr-gcc 7.3.0` with `-Os` optimization and evaluated via `avr-size -C --mcu=atmega328p` on the compiled machine binary.
+> 3. **CMSIS-NN & Edge Impulse Baselines:** Reference baseline values taken from published ARM Cortex-M4 whitepapers (1D-CNN @ 80 MHz) and Edge Impulse EON compiler documentation for equivalent cardiac CNN topologies. Not physically flashed in this setup.
+> 4. **Algorithmic 100k Latency & P99:** Measured via host nanosecond timer `time.perf_counter_ns()` to evaluate statistical $O(1)$ determinism and verify absence of GC/tail-latency spikes.
+
 ---
 
 ## 3. Clinical Detection Accuracy (ANSI/AAMI EC57 Protocol)
