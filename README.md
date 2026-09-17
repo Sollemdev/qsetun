@@ -7,7 +7,7 @@
 [![Memory: 0 B Malloc](https://img.shields.io/badge/RAM_Heap-0_Bytes_Malloc-brightgreen.svg)]()
 [![Speed: 1.0 us](https://img.shields.io/badge/Latency-1.0_μs_(270x_Faster)-orange.svg)]()
 [![Hardware: ESP32 / STM32 / AVR](https://img.shields.io/badge/Hardware-ESP32_|_STM32_|_AVR_|_RP2040-purple.svg)]()
-[![Release: v1.0.1](https://img.shields.io/badge/Release-v1.0.1-blue.svg)](https://github.com/Sollemdev/qsetun/releases/tag/v1.0.1)
+[![Release: v2.0.0](https://img.shields.io/badge/Release-v2.0.0-blue.svg)](https://github.com/Sollemdev/qsetun/releases/tag/v2.0.0)
 
 ---
 
