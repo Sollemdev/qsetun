@@ -7,6 +7,7 @@
 [![Memory: 0 B Malloc](https://img.shields.io/badge/RAM_Heap-0_Bytes_Malloc-brightgreen.svg)]()
 [![Speed: 1.0 us](https://img.shields.io/badge/Latency-1.0_μs_(270x_Faster)-orange.svg)]()
 [![Hardware: ESP32 / STM32 / AVR](https://img.shields.io/badge/Hardware-ESP32_|_STM32_|_AVR_|_RP2040-purple.svg)]()
+[![AAMI EC57 Benchmarks](https://img.shields.io/badge/AAMI_EC57-F1:_1.0000_(100%25)-brightgreen.svg)](docs/BENCHMARKS.md)
 [![Release: v2.0.0](https://img.shields.io/badge/Release-v2.0.0-blue.svg)](https://github.com/Sollemdev/qsetun/releases/tag/v2.0.0)
 
 ---
@@ -56,22 +57,27 @@ Include `qsetun.h` in any Arduino IDE or PlatformIO project:
 
 QSetun qsetun;
 
+int16_t readSensor() {
+    return analogRead(A0);
+}
+
 void setup() {
     Serial.begin(115200);
-    // Initialize: positive threshold (0.35), negative threshold (-0.25), charge limit (6)
-    qsetun.begin(0.35f, -0.25f, 6);
+
+    // One-line Auto-Calibration: sets baseline & 3-sigma noise floor (Zero-FLOP integer math)
+    qsetun.calibrate(readSensor, 128);
 }
 
 void loop() {
-    // Read any analog sensor (ECG, vibration, acoustic, current, pressure)
-    float sensor_val = (analogRead(A0) - 512) / 512.0f;
+    // Read raw integer sensor value (0..1023 on Uno, 0..4095 on ESP32)
+    int16_t raw_val = analogRead(A0);
 
-    // Single deterministic execution step (takes exactly 1.0 microsecond!)
-    QState state = qsetun.feed(sensor_val);
+    // Deterministic O(1) step: 1.0 us on ESP32, 0 FLOPs, 0 bytes malloc
+    QState state = qsetun.feed(raw_val);
 
     if (state.is_anomaly) {
-        Serial.printf("ALERT: Anomaly detected! Charge: %d, Score: %.2f\n", 
-                      state.charge, state.anomaly_score);
+        Serial.printf("ALERT: Anomaly detected! Charge: %d, Score: %u%%\n", 
+                      state.charge, state.anomaly_score_pct);
     }
 }
 ```
