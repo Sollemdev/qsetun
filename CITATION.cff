@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software in academic or industrial research, please cite it as below."
+authors:
+  - family-names: "Kulcha"
+    given-names: "Leonid"
+    affiliation: "Noosphere Research Lab"
+  - family-names: "Antigravity"
+    given-names: "Architecture Co-Author"
+    affiliation: "Noosphere Research Lab"
+title: "Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis for Edge AI"
+version: 1.0.1
+doi: 10.5281/zenodo.22813548
+date-released: 2026-09-17
+url: "https://github.com/Sollemdev/qsetun"
+license: GPL-3.0
+keywords:
+  - "neuromorphic-computing"
+  - "balanced-ternary"
+  - "edge-ai"
+  - "brusentsov-setun"
+  - "cellular-apoptosis"
+  - "qutrit"
+  - "tinyml"
+  - "esp32"

@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map For QSetun
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+QSetun	KEYWORD1
+QTrit	KEYWORD1
+QState	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+feed	KEYWORD2
+reset	KEYWORD2
+setThresholds	KEYWORD2
+getBaseline	KEYWORD2
+isAnomaly	KEYWORD2
+getScore	KEYWORD2
+getCyclesCount	KEYWORD2
+
+#######################################
+# Constants and Literals (LITERAL1)
+#######################################
+
+Negative	LITERAL1
+Zero	LITERAL1
+Positive	LITERAL1
+is_anomaly	LITERAL1
+anomaly_score	LITERAL1
+charge	LITERAL1
+cycle_width	LITERAL1
+noise_annihilated	LITERAL1

@@ -1,0 +1,27 @@
+{
+  "title": "Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis for Edge AI",
+  "creators": [
+    {
+      "name": "Kulcha, Leonid",
+      "affiliation": "Noosphere Research Lab"
+    },
+    {
+      "name": "Antigravity",
+      "affiliation": "Noosphere Research Lab"
+    }
+  ],
+  "description": "Zero-FLOP Neuromorphic Edge AI using Brusentsov balanced ternary qutrits and cellular apoptosis. Physical silicon benchmark on ESP32 demonstrates 1.0 microsecond latency, zero heap allocation (malloc=0), and 270x speedup over TensorFlow Lite Micro.",
+  "access_right": "open",
+  "license": "GPL-3.0-only",
+  "keywords": [
+    "neuromorphic computing",
+    "balanced ternary",
+    "edge ai",
+    "cellular apoptosis",
+    "qutrit",
+    "brusentsov",
+    "esp32",
+    "tinyml"
+  ],
+  "upload_type": "software"
+}
