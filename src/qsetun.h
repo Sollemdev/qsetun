@@ -79,6 +79,13 @@ public:
     }
 
     /**
+     * Integer literal convenience overload (prevents ambiguity on 16-bit AVR).
+     */
+    void begin(int pos_threshold_q8, int neg_threshold_q8, int charge_limit = 6) {
+        begin(static_cast<int32_t>(pos_threshold_q8), static_cast<int32_t>(neg_threshold_q8), static_cast<int16_t>(charge_limit));
+    }
+
+    /**
      * Backward-compatible initialization with normalized float thresholds.
      * Default values (0.35f, -0.25f, 6) map to clinical ECG normalized profiles.
      */
@@ -131,7 +138,7 @@ public:
             // Digit-by-digit integer square root algorithm (Zero-FLOP)
             int32_t x = variance;
             int32_t c = 0;
-            int32_t d = 1 << 30;
+            int32_t d = (int32_t)1L << 30;
             while (d > x) d >>= 2;
             while (d != 0) {
                 if (x >= c + d) {

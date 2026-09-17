@@ -1,0 +1,41 @@
+name: Q-SETUN Empirical Benchmarks & CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install Hardware Toolchains (AVR GCC & Size)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-avr binutils-avr avr-libc
+
+    - name: Run Full Empirical Benchmark Suite
+      run: |
+        python benchmarks/run_all_benchmarks.py
+
+    - name: Verify Results
+      run: |
+        python -c '
+        import json
+        with open("benchmarks/benchmark_results.json") as f:
+            d = json.load(f)
+        assert d["clinical_accuracy"]["f1_score"] >= 0.95, "F1 score failed"
+        assert d["clinical_accuracy"]["fn"] == 0, "Missed clinical arrhythmia"
+        assert all(d["stress_robustness"].values()), "Stress test failed"
+        print("CI BENCHMARK VERIFICATION PASSED!")
+        '

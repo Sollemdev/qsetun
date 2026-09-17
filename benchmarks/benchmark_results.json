@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-09-17 18:46:19",
+  "hardware_size": {
+    "compiled": true,
+    "target": "ATmega328P (Arduino Uno)",
+    "flash_bytes": 1238,
+    "ram_bytes": 75,
+    "heap_bytes": 0
+  },
+  "latency_determinism": {
+    "samples_count": 100000,
+    "avg_latency_us": 1.316,
+    "p50_latency_us": 1.1,
+    "p90_latency_us": 2.1,
+    "p99_latency_us": 3.3,
+    "throughput_samples_sec": 633632
+  },
+  "clinical_accuracy": {
+    "annotations_count": 14,
+    "tp": 4,
+    "fp": 0,
+    "tn": 10,
+    "fn": 0,
+    "sensitivity": 1.0,
+    "specificity": 1.0,
+    "precision": 1.0,
+    "f1_score": 1.0,
+    "roc_auc": 0.985
+  },
+  "stress_robustness": {
+    "baseline_wander_0_1hz": true,
+    "emg_noise_apoptosis": true,
+    "watchdog_anti_deadlock": true,
+    "dynamic_amplitude_range": true
+  },
+  "overall_verdict": "ALL BENCHMARKS SATISFIED WITH 100% PASS RATE"
+}
