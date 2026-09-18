@@ -21,7 +21,10 @@
 SPIClass tft_spi(VSPI);
 QSetun qsetun;
 
-#define BTN_PIN 0 // Top button (GPIO 0, active LOW) -> Injects muscle noise
+#define BTN_PIN       0   // Top button (GPIO 0, active LOW) -> Injects muscle noise
+#define BUZZER_PIN    25  // Active Buzzer TMB12A05 (GPIO 25, active HIGH)
+#define LED_RED_PIN   26  // Red LED: Arrhythmia Alarm (GPIO 26, active HIGH)
+#define LED_GREEN_PIN 27  // Green LED: Normal Pulse Beat (GPIO 27, active HIGH)
 
 // Screen layout
 #define SCOPE_Y_MID 52
@@ -50,6 +53,14 @@ void setup() {
     delay(200);
 
     pinMode(BTN_PIN, INPUT_PULLUP);
+    pinMode(BUZZER_PIN, OUTPUT);
+    pinMode(LED_RED_PIN, OUTPUT);
+    pinMode(LED_GREEN_PIN, OUTPUT);
+
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(LED_RED_PIN, LOW);
+    digitalWrite(LED_GREEN_PIN, LOW);
+
     tft_init();
 
     // Initial Screen Header
@@ -72,18 +83,38 @@ void setup() {
 static uint32_t last_hud_refresh = 0;
 static uint32_t frame_count = 0;
 static uint32_t last_fps_calc = 0;
+static uint32_t last_frame_us = 0;
 
 void loop() {
+    uint32_t now_us = micros();
     uint32_t now = millis();
+
+    // Exact 60.0 FPS hardware frame pacing (16,666 us per frame)
+    if (now_us - last_frame_us < 16666) return;
+    last_frame_us = now_us;
+    frame_count++;
 
     // Check physical noise button (GPIO 0)
     tele.noise_injected = (digitalRead(BTN_PIN) == LOW);
 
-    // Read next clinical ECG point
+    // Render 1 ECG sample per loop step (ultra-smooth fluid trace)
     float raw_val = ecg_stream_data[sample_idx % ECG_STREAM_LEN];
-    if (tele.noise_injected) {
-        // High-frequency muscle noise
-        raw_val += ((random(100) - 50) / 100.0f) * 0.45f;
+        if (tele.noise_injected) {
+            raw_val += ((random(100) - 50) / 100.0f) * 0.45f;
+        }
+
+    static uint32_t green_led_off = 0;
+    static uint32_t alarm_off = 0;
+
+    // Non-blocking auto-off timers for Audio & LEDs
+    if (green_led_off && now >= green_led_off) {
+        digitalWrite(LED_GREEN_PIN, LOW);
+        green_led_off = 0;
+    }
+    if (alarm_off && now >= alarm_off) {
+        digitalWrite(LED_RED_PIN, LOW);
+        digitalWrite(BUZZER_PIN, LOW);
+        alarm_off = 0;
     }
 
     // Step the Q-Setun Engine (1.0 microsecond deterministic step)
@@ -97,45 +128,51 @@ void loop() {
 
         if (tele.is_arrhythmia) {
             tele.arrhythmia_detected++;
+            digitalWrite(LED_RED_PIN, HIGH);
+            digitalWrite(BUZZER_PIN, HIGH);
+            alarm_off = now + 150; // 150 ms red alert alarm buzz
+        } else {
+            digitalWrite(LED_GREEN_PIN, HIGH);
+            green_led_off = now + 40; // 40 ms clean green pulse flash
         }
     }
 
-    // 1. Draw Oscilloscope Radar Sweep
-    tft_fill_rect(scope_x + 1, SCOPE_Y_TOP, 6, SCOPE_H, COLOR_BLACK);
-    if ((scope_x % 40) == 0) {
-        for (int y = SCOPE_Y_TOP; y < SCOPE_Y_BOT; y += 8) {
-            tft_draw_pixel(scope_x, y, COLOR_DARKGREY);
+        // Oscilloscope sweep
+        tft_fill_rect(scope_x + 1, SCOPE_Y_TOP, 4, SCOPE_H, COLOR_BLACK);
+        if ((scope_x % 40) == 0) {
+            for (int y = SCOPE_Y_TOP; y < SCOPE_Y_BOT; y += 8) {
+                tft_draw_pixel(scope_x, y, COLOR_DARKGREY);
+            }
         }
-    }
 
-    int16_t curr_y = SCOPE_Y_MID - (int16_t)(raw_val * 24.0f);
-    if (curr_y < SCOPE_Y_TOP) curr_y = SCOPE_Y_TOP;
-    if (curr_y > SCOPE_Y_BOT) curr_y = SCOPE_Y_BOT;
+        int16_t curr_y = SCOPE_Y_MID - (int16_t)(raw_val * 24.0f);
+        if (curr_y < SCOPE_Y_TOP) curr_y = SCOPE_Y_TOP;
+        if (curr_y > SCOPE_Y_BOT) curr_y = SCOPE_Y_BOT;
 
-    uint16_t trace_color = tele.is_arrhythmia ? COLOR_RED : (tele.noise_injected ? COLOR_YELLOW : COLOR_GREEN);
-    if (scope_x > 0) {
-        tft_draw_line(scope_x - 1, prev_scope_y, scope_x, curr_y, trace_color);
-    }
-    prev_scope_y = curr_y;
-
-    scope_x++;
-    if (scope_x >= TFT_W) {
-        scope_x = 0;
+        uint16_t trace_color = tele.is_arrhythmia ? COLOR_RED : (tele.noise_injected ? COLOR_YELLOW : COLOR_GREEN);
+        if (scope_x > 0) {
+            tft_draw_line(scope_x - 1, prev_scope_y, scope_x, curr_y, trace_color);
+        }
         prev_scope_y = curr_y;
+
+        scope_x++;
+        if (scope_x >= TFT_W) {
+            scope_x = 0;
+            prev_scope_y = curr_y;
+        }
+
+        sample_idx++;
+
+    // FPS Calculation every 1000ms
+    if (now - last_fps_calc >= 1000) {
+        tele.fps = (frame_count * 1000) / (now - last_fps_calc);
+        frame_count = 0;
+        last_fps_calc = now;
     }
 
-    sample_idx++;
-    frame_count++;
-
-    // 2. Refresh Screen HUD every 100ms
-    if (now - last_hud_refresh >= 100) {
+    // Refresh HUD Telemetry every 150ms
+    if (now - last_hud_refresh >= 150) {
         last_hud_refresh = now;
-
-        if (now - last_fps_calc >= 1000) {
-            tele.fps = frame_count * 1000 / (now - last_fps_calc);
-            frame_count = 0;
-            last_fps_calc = now;
-        }
 
         tele.chip_temp = temperatureRead();
         tele.free_heap = ESP.getFreeHeap();
@@ -156,15 +193,13 @@ void loop() {
         char line1[36], line2[36], line3[36];
         snprintf(line1, sizeof(line1), "LATENCY: 1.0us | HEAP: 0 BYTES");
         snprintf(line2, sizeof(line2), "RAM: %d KB | Q-CHARGE: %+d", tele.free_heap / 1024, tele.charge);
-        snprintf(line3, sizeof(line3), "TEMP: %4.1f C | FPS: %2d | BEAT:%u", tele.chip_temp, tele.fps, tele.total_beats);
+        snprintf(line3, sizeof(line3), "TEMP: %4.1f C | FPS: %2u | BEAT:%u", tele.chip_temp, tele.fps, tele.total_beats);
 
         tft_draw_string(4, SCOPE_Y_BOT + 5,  line1, COLOR_GREEN, COLOR_BLACK, 1);
         tft_draw_string(4, SCOPE_Y_BOT + 17, line2, COLOR_WHITE, COLOR_BLACK, 1);
         tft_draw_string(4, SCOPE_Y_BOT + 29, line3, COLOR_CYAN,  COLOR_BLACK, 1);
 
-        Serial.printf("{\"engine\":\"QSetun\",\"beat\":%u,\"arrhythmia\":%d,\"score\":%.3f,\"temp_c\":%.1f,\"heap_kb\":%u}\n",
-            tele.total_beats, tele.is_arrhythmia ? 1 : 0, tele.anomaly_score, tele.chip_temp, tele.free_heap / 1024);
+        Serial.printf("{\"engine\":\"QSetun\",\"beat\":%u,\"arrhythmia\":%d,\"score\":%.3f,\"temp_c\":%.1f,\"fps\":%u,\"heap_kb\":%u}\n",
+            tele.total_beats, tele.is_arrhythmia ? 1 : 0, tele.anomaly_score, tele.chip_temp, tele.fps, tele.free_heap / 1024);
     }
-
-    delay(10);
 }

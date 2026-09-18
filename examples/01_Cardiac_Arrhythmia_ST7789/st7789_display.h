@@ -173,17 +173,39 @@ static const uint8_t FONT5x7[][5] PROGMEM = {
 };
 
 static inline void tft_draw_char(int16_t x, int16_t y, char c, uint16_t color, uint16_t bg, uint8_t scale) {
+    if (x >= TFT_W || y >= TFT_H) return;
     if (c < 32 || c > 95) c = ' ';
     uint8_t idx = c - 32;
 
-    for (int8_t i = 0; i < 5; ++i) {
-        uint8_t line = pgm_read_byte(&FONT5x7[idx][i]);
-        for (int8_t j = 0; j < 7; ++j) {
-            uint16_t pixel_color = (line & (1 << j)) ? color : bg;
-            tft_fill_rect(x + i * scale, y + j * scale, scale, scale, pixel_color);
+    int16_t w = 6 * scale;
+    int16_t h = 7 * scale;
+    tft_set_window(x, y, x + w - 1, y + h - 1);
+    digitalWrite(TFT_DC, HIGH);
+    digitalWrite(TFT_CS, LOW);
+
+    uint8_t hi_c = color >> 8, lo_c = color & 0xFF;
+    uint8_t hi_b = bg >> 8,    lo_b = bg & 0xFF;
+
+    for (int8_t j = 0; j < 7; ++j) {
+        for (uint8_t sy = 0; sy < scale; ++sy) {
+            for (int8_t i = 0; i < 5; ++i) {
+                uint8_t line = pgm_read_byte(&FONT5x7[idx][i]);
+                bool on = (line & (1 << j)) != 0;
+                uint8_t hi = on ? hi_c : hi_b;
+                uint8_t lo = on ? lo_c : lo_b;
+                for (uint8_t sx = 0; sx < scale; ++sx) {
+                    tft_spi.write(hi);
+                    tft_spi.write(lo);
+                }
+            }
+            // 6th column spacing
+            for (uint8_t sx = 0; sx < scale; ++sx) {
+                tft_spi.write(hi_b);
+                tft_spi.write(lo_b);
+            }
         }
     }
-    tft_fill_rect(x + 5 * scale, y, scale, 7 * scale, bg);
+    digitalWrite(TFT_CS, HIGH);
 }
 
 static inline void tft_draw_string(int16_t x, int16_t y, const char* str, uint16_t color, uint16_t bg, uint8_t scale) {

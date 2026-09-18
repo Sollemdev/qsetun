@@ -56,7 +56,7 @@ All physical benchmarks were compiled using actual target cross-compilers (`avr-
 | **Static RAM Footprint (AVR)** | **75 Bytes (.bss)** | *N/A (Exceeds RAM)* | *N/A (ARM only)* | *N/A (Exceeds RAM)* | **Runs on 2 KB Uno** |
 | **Flash Binary Footprint (AVR)** | **1,238 Bytes (.text)** | *N/A (Exceeds Flash)* | *N/A (ARM only)* | *N/A (Exceeds Flash)* | **3.8% of 32 KB Flash** |
 | **Silicon Temperature (ESP32)** | **33.3°C** | 35.0°C | 34.1°C | 34.6°C | **Cold Silicon (-1.7°C)** |
-| **ST7789 UI Refresh** | **60 FPS** (Fluid SPI) | 2 FPS (Compute Bottleneck) | ~25 FPS | ~15 FPS | **30x Smoother Oscilloscope** |
+| **ST7789 UI Refresh** | **37 FPS** (Fluid SPI) | 2 FPS (Compute Bottleneck) | ~25 FPS | ~15 FPS | **18.5x Smoother Oscilloscope** |
 | **AAMI EC57 F1-Score** | **1.0000** | 0.9120 | 0.9250 | 0.9300 | **Topological Robustness** |
 | **Arithmetic Type** | **Integer Fixed-Point (Q8)** | Float32 / Int8 Quantized | Int8 Quantized | Int8 Quantized | **Zero-FLOP** |
 
