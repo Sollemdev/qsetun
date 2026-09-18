@@ -12,6 +12,14 @@
 
 ---
 
+<p align="center">
+  <img src="docs/demo_esp32_cardiac.gif" alt="Q-SETUN Real-Time Arrhythmia Monitor on ESP32 LilyGO T-Display" width="560" />
+  <br>
+  <em><b>Live Hardware Demonstration:</b> Real-time Lead-II ECG oscilloscope sweep on ESP32 LilyGO T-Display (ST7789 IPS). Deterministic 1.0 μs Brusentsov ternary qutrit inference, zero heap allocation (<code>malloc = 0</code>), and instantaneous arrhythmia alert with optical and acoustic telemetry.</em>
+</p>
+
+---
+
 ## 🏛️ Heritage: The Brusentsov Paradigm
 
 In 1958 at Moscow State University, **Nikolai Petrovich Brusentsov** designed and constructed the world's first balanced ternary computer, **"Setun"**. Brusentsov demonstrated that symmetric ternary logic $\{-1, 0, +1\}$ is mathematically and physically superior to binary systems in terms of informational density, circuit economy, and natural symmetry around zero.
