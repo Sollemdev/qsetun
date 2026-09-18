@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+  "name": "QSetun",
+  "version": "2.0.0",
+  "description": "Integer-only neuromorphic Edge AI using Brusentsov balanced ternary qutrits and cellular apoptosis. Zero floating-point: 100% integer arithmetic, zero-malloc signal processing engine for microcontrollers.",
+  "keywords": [
+    "neuromorphic-computing",
+    "balanced-ternary",
+    "edge-ai",
+    "brusentsov-setun",
+    "cellular-apoptosis",
+    "qutrit",
+    "tinyml",
+    "esp32",
+    "espressif8266",
+    "ststm32",
+    "atmelavr",
+    "raspberrypi",
+    "nordicnrf52",
+    "signal-processing",
+    "integer-arithmetic",
+    "zero-malloc"
+  ],
+  "homepage": "https://github.com/Sollemdev/qsetun",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sollemdev/qsetun.git"
+  },
+  "authors": [
+    {
+      "name": "Leonid Kulcha",
+      "email": "216130664+Sollemdev@users.noreply.github.com",
+      "url": "https://github.com/Sollemdev",
+      "maintainer": true
+    },
+    {
+      "name": "Antigravity",
+      "maintainer": false
+    }
+  ],
+  "license": "GPL-3.0",
+  "frameworks": "arduino",
+  "platforms": [
+    "espressif32",
+    "espressif8266",
+    "ststm32",
+    "atmelavr",
+    "raspberrypi",
+    "nordicnrf52"
+  ],
+  "headers": "qsetun.h",
+  "examples": [
+    {
+      "name": "01_Cardiac_Arrhythmia_ST7789",
+      "base": "examples/01_Cardiac_Arrhythmia_ST7789",
+      "files": [
+        "01_Cardiac_Arrhythmia_ST7789.ino",
+        "ecg_dataset.h",
+        "st7789_display.h"
+      ]
+    },
+    {
+      "name": "02_Basic_Anomaly_Detector",
+      "base": "examples/02_Basic_Anomaly_Detector",
+      "files": [
+        "02_Basic_Anomaly_Detector.ino"
+      ]
+    },
+    {
+      "name": "03_Noise_Apoptosis_Stress",
+      "base": "examples/03_Noise_Apoptosis_Stress",
+      "files": [
+        "03_Noise_Apoptosis_Stress.ino"
+      ]
+    }
+  ]
+}
