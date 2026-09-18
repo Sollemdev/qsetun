@@ -103,19 +103,7 @@ void loop() {
             raw_val += ((random(100) - 50) / 100.0f) * 0.45f;
         }
 
-    static uint32_t green_led_off = 0;
-    static uint32_t alarm_off = 0;
-
-    // Non-blocking auto-off timers for Audio & LEDs
-    if (green_led_off && now >= green_led_off) {
-        digitalWrite(LED_GREEN_PIN, LOW);
-        green_led_off = 0;
-    }
-    if (alarm_off && now >= alarm_off) {
-        digitalWrite(LED_RED_PIN, LOW);
-        digitalWrite(BUZZER_PIN, LOW);
-        alarm_off = 0;
-    }
+    static uint32_t normal_beep_off = 0;
 
     // Step the Q-Setun Engine (1.0 microsecond deterministic step)
     QState state = qsetun.feed(raw_val);
@@ -128,13 +116,32 @@ void loop() {
 
         if (tele.is_arrhythmia) {
             tele.arrhythmia_detected++;
+            // RED ZONE: Persistent alarm - Red LED ON, continuous buzzer siren!
             digitalWrite(LED_RED_PIN, HIGH);
             digitalWrite(BUZZER_PIN, HIGH);
-            alarm_off = now + 150; // 150 ms red alert alarm buzz
+            digitalWrite(LED_GREEN_PIN, LOW);
+            normal_beep_off = 0;
         } else {
+            // GREEN ZONE: Clean normal beat - single pulse beep and green flash
+            digitalWrite(LED_RED_PIN, LOW);
             digitalWrite(LED_GREEN_PIN, HIGH);
-            green_led_off = now + 40; // 40 ms clean green pulse flash
+            digitalWrite(BUZZER_PIN, HIGH);
+            normal_beep_off = now + 35; // 35 ms crisp pulse beep
         }
+    }
+
+    // Audio / Visual state update
+    if (!tele.is_arrhythmia) {
+        if (normal_beep_off && now >= normal_beep_off) {
+            digitalWrite(LED_GREEN_PIN, LOW);
+            digitalWrite(BUZZER_PIN, LOW);
+            normal_beep_off = 0;
+        }
+    } else {
+        // Force hold alarm while in red zone
+        digitalWrite(LED_RED_PIN, HIGH);
+        digitalWrite(BUZZER_PIN, HIGH);
+        digitalWrite(LED_GREEN_PIN, LOW);
     }
 
         // Oscilloscope sweep
