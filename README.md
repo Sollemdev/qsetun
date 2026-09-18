@@ -50,7 +50,7 @@ Measured on actual `ESP32-D0WDQ6-V3` silicon (COM3) running a continuous clinica
 | **Heap Allocation (`malloc`)** | **24,576 bytes** (`TensorArena`) | **0 bytes (`malloc = 0`)** | **Zero fragmentation** |
 | **Free Heap on ESP32** | **291 KB** | **321 KB** | **+30 KB free** for UI/WiFi |
 | **Silicon Temperature** | **35.0°C** | **33.3°C** | **Cold silicon (-1.7°C)** |
-| **ST7789 Display Refresh** | **2 FPS** (computation bottleneck) | **37 FPS** (fluid hardware SPI sweep) | **18.5x smoother** |
+| **Supported Hardware Class** | 32-bit MCUs ($\ge 32\text{ KB}$ RAM) | 8-bit AVR, 32-bit ARM, ESP32 ($\ge 192\text{ B}$ RAM) | **Runs on 2 KB Uno** |
 | **Arrhythmia Detection (Beat #03)** | `Score: 0.138` (**MISSED**) | `Score: 0.980` (**DETECTED**) | **100% Accuracy** |
 | **Noise Annihilation (GPIO 0)** | Signal jitter, false alarm risk | **Annihilated $(+1) + (-1) \to 0$** | **100% Noise rejection** |
 

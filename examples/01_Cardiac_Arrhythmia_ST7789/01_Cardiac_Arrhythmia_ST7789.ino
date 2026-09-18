@@ -6,7 +6,7 @@
  * Demonstrates:
  *   - Continuous clinical ECG Lead-II stream (MIT-BIH profile)
  *   - Balanced ternary attractor tracking with cellular apoptosis
- *   - Real-time ST7789 60 FPS oscilloscope sweep
+ *   - Real-time ST7789 hardware oscilloscope sweep (~37 FPS)
  *   - Sub-microsecond latency (1.0 us) and zero heap allocation (malloc = 0)
  * ============================================================================
  */
@@ -89,7 +89,7 @@ void loop() {
     uint32_t now_us = micros();
     uint32_t now = millis();
 
-    // Exact 60.0 FPS hardware frame pacing (16,666 us per frame)
+    // Hardware frame pacing (actual throughput ~37 FPS limited by SPI display bus)
     if (now_us - last_frame_us < 16666) return;
     last_frame_us = now_us;
     frame_count++;
