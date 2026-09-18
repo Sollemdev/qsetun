@@ -1,6 +1,6 @@
-# Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis
-> **Zero-FLOP Neuromorphic Edge AI for Microcontrollers.**  
-> *Empirically validated on silicon: 1.0 microsecond latency, 0 bytes dynamic heap allocation (`malloc = 0`), 270x faster than TensorFlow Lite Micro.*
+# Q-SETUN: Brusentsov Balanced Ternary Signal Core with Cellular Apoptosis
+> **Zero Floating-Point, Integer-Only Signal Intelligence for Microcontrollers.**  
+> *Empirically validated on silicon: 1.0 microsecond latency, 0 bytes dynamic heap allocation (`malloc = 0`), 100% integer arithmetic (0 FLOPs).*
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22813548.svg)](https://doi.org/10.5281/zenodo.22813548)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -45,6 +45,34 @@ Measured on actual `ESP32-D0WDQ6-V3` silicon (COM3) running a continuous clinica
 | **ST7789 Display Refresh** | **2 FPS** (computation bottleneck) | **60 FPS** (fluid hardware SPI) | **30x smoother** |
 | **Arrhythmia Detection (Beat #03)** | `Score: 0.138` (**MISSED**) | `Score: 0.980` (**DETECTED**) | **100% Accuracy** |
 | **Noise Annihilation (GPIO 0)** | Signal jitter, false alarm risk | **Annihilated $(+1) + (-1) \to 0$** | **100% Noise rejection** |
+
+---
+
+## ⚖️ Architectural Scope & Honest Positioning
+
+* **Target Problem:** Q-SETUN is designed specifically for **1D quasi-periodic continuous sensor streams** (ECG, vibration monitoring, photoplethysmography, current sense).
+* **Comparison with TensorFlow Lite Micro (TFLM):** TFLM is a general-purpose $O(n \cdot m)$ tensor framework capable of vision, NLP, and regression. The 270x latency and memory advantage of Q-SETUN stems from algorithmic specialization: replacing heavy general matrix multiplications with an $O(1)$ integer phase-space attractor for single-channel threshold anomaly tasks where deep neural networks are an over-engineered computational bottleneck.
+* **AAMI EC57 Benchmark Note:** The included automated test profile validates against the standard AAMI EC57 Lead-II arrhythmia waveform profile (MIT-BIH synthetic lead). Clinical diagnostic deployment requires validation across the full multi-patient MIT-BIH Arrhythmia Database.
+
+---
+
+## 📦 Installation
+
+### PlatformIO
+Add the repository directly to your `platformio.ini`:
+```ini
+lib_deps =
+    https://github.com/Sollemdev/qsetun.git
+```
+Or install via PlatformIO Registry:
+```bash
+pio pkg install --library "Sollemdev/QSetun"
+```
+
+### Arduino IDE
+1. Download this repository as a `.zip` file from [GitHub Releases](https://github.com/Sollemdev/qsetun/releases).
+2. In the Arduino IDE, navigate to **Sketch -> Include Library -> Add .ZIP Library...** and select the file.
+3. Once registered in the Arduino Library Manager index, search for **`QSetun`** directly in the IDE Library Manager.
 
 ---
 
