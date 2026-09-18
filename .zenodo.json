@@ -10,7 +10,7 @@
       "affiliation": "Noosphere Research Lab"
     }
   ],
-  "description": "Zero-FLOP Neuromorphic Edge AI using Brusentsov balanced ternary qutrits and cellular apoptosis. Physical silicon benchmark on ESP32 demonstrates 1.0 microsecond latency, zero heap allocation (malloc=0), and 270x speedup over TensorFlow Lite Micro.",
+  "description": "Integer-only signal intelligence engine using Brusentsov balanced ternary logic and cellular apoptosis. Physical silicon benchmark on ESP32 demonstrates 1.0 microsecond latency, zero heap allocation (malloc=0), and 100% integer arithmetic (zero floating-point).",
   "access_right": "open",
   "license": "GPL-3.0-only",
   "keywords": [
