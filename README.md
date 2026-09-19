@@ -125,6 +125,21 @@ void loop() {
 1. **`01_Cardiac_Arrhythmia_ST7789`** — Turnkey clinical arrhythmia monitor on LilyGO T-Display (ST7789 IPS 135x240) running a 37 FPS hardware oscilloscope sweep.
 2. **`02_Basic_Anomaly_Detector`** — Universal anomaly detector for any analog sensor running on any board (Arduino Uno, STM32, ESP32).
 3. **`03_Noise_Apoptosis_Stress`** — Interactive high-frequency noise injection demonstrating real-time cellular apoptosis $(+1) + (-1) \to 0$.
+4. **`04_AutoCalibrate_SerialPlotter`** — **Zero wiring required.** Auto-calibration from ambient noise + synthetic signal with anomaly/noise injection. Open Serial Plotter and watch Q-SETUN work in real time. Any board.
+
+---
+
+## 📖 Documentation
+
+| Document | Description |
+| :--- | :--- |
+| **[Getting Started](docs/GETTING_STARTED.md)** | 5-minute guide: install → wire → upload → see results in Serial Plotter |
+| **[API Reference](docs/API_REFERENCE.md)** | Complete reference for every method, struct, enum, and platform note |
+| **[Tuning Guide](docs/TUNING_GUIDE.md)** | How to set thresholds, choose `charge_limit`, tune `calibrate()`, and fix common issues |
+| **[Benchmarks](docs/BENCHMARKS.md)** | Physical silicon benchmark data (ESP32, latency, memory, temperature) |
+| **[Architecture](docs/ARCHITECTURE.md)** | Internal design: 4-stage pipeline, Q8 math, apoptosis tiers, attractor state machine |
+| **[Changelog](CHANGELOG.md)** | Version history and upgrade notes |
+| **[Contributing](CONTRIBUTING.md)** | How to contribute, core invariants, code style |
 
 ---
 
