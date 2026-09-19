@@ -1,0 +1,52 @@
+name: Bug Report
+description: Report a bug or incorrect behavior
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please fill out the sections below.
+  - type: input
+    id: board
+    attributes:
+      label: Hardware Platform
+      description: Board and MCU (e.g. ESP32-S3, Arduino Uno ATmega328P, STM32F411)
+      placeholder: ESP32-DevKitC v4
+    validations:
+      required: true
+  - type: input
+    id: ide
+    attributes:
+      label: IDE / Toolchain
+      description: Arduino IDE version, PlatformIO version, or compiler
+      placeholder: Arduino IDE 2.3.2 / PlatformIO 6.1
+    validations:
+      required: true
+  - type: input
+    id: library-version
+    attributes:
+      label: Q-SETUN Version
+      placeholder: v2.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What happened vs. what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Minimal Sketch to Reproduce
+      description: Paste a minimal .ino sketch that reproduces the issue
+      render: cpp
+    validations:
+      required: true
+  - type: textarea
+    id: serial-output
+    attributes:
+      label: Serial Monitor Output
+      render: text
