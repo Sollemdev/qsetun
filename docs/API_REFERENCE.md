@@ -1,6 +1,6 @@
 # Q-SETUN API Reference
 
-> Complete reference for `qsetun.h` v2.0.0
+> Complete reference for `qsetun.h` v2.1.0
 > All methods are `O(1)` time, `0` heap allocation, `0` floating-point operations in the core path.
 
 ---
@@ -34,6 +34,8 @@ struct QState {
     float    anomaly_score;        // 0.0 to 0.98. Backward-compatible float copy.
     int16_t  charge;               // Net topological charge of the last completed cycle
     uint16_t cycle_width;          // Width of last cycle in samples
+    uint16_t wave_energy;          // v2.1: accumulated |diff| inside the cycle (>> 8, saturated)
+    uint8_t  wave_trit_density_pct;// v2.1: share of non-zero trits in the cycle (0..100)
     QTrit    current_trit;         // Discretized trit for the current sample
     uint32_t cycles_count;         // Total completed cycles since reset
 };
@@ -47,6 +49,8 @@ struct QState {
 | `beat_classified` | On cycle completion | A full positive→zero excursion just ended. Check `charge` and `cycle_width` for its shape. |
 | `noise_annihilated` | Every sample | High-frequency jitter was dissolved: either opposing trits (+1 then -1) cancelled, or a 1-sample glitch was erased. |
 | `anomaly_score_pct` | On cycle completion | `2` = normal, `98` = anomaly. Stays at last value between completions. |
+| `wave_energy` | On cycle completion | v2.1: total `|diff|` energy of the closed cycle (Q8, smoothed). Larger → stronger deflection. |
+| `wave_trit_density_pct` | On cycle completion | v2.1: `100 × non_zero_trits / width`. Together with `wave_energy` separates sharp-strong from wide-weak cycles. |
 | `current_trit` | Every sample | The filtered ternary state after apoptosis: `-1`, `0`, or `+1`. |
 
 ---
@@ -59,7 +63,7 @@ struct QState {
 QSetun qsetun;
 ```
 
-Creates an engine instance. Calls `reset()` internally. Memory footprint: **192 bytes** of flat static state. No heap allocation.
+Creates an engine instance. Calls `reset()` internally. Memory footprint: **84 bytes** of flat static state (measured with avr-g++ 7.3, `-Os`). No heap allocation.
 
 ---
 
@@ -193,6 +197,39 @@ qsetun.setThresholds(50 << 8, -(40 << 8), 8);
 
 ---
 
+### `configure()` — v2.1 Advanced Tuning (Optional)
+
+```cpp
+void configure(uint16_t hysteresis_q8 = 0, uint8_t live_sigma = 0);
+```
+
+Both parameters default to **exact v2.0 behavior** — omit the call (or call with defaults) and the engine is bit-for-bit v2.0.
+
+| Param | Default | Description |
+|:--|:--:|:--|
+| `hysteresis_q8` | `0` | Ternary state memory width in Q8 `diff` units. Once a trit enters `+1`, it HOLDS until `diff` falls below `pos − hyst`; mirroring for `−1` (hold above `neg + hyst`). A deep crossing of the *opposite* threshold is still a legit instant sign flip. Verified: −34.3 % trit chatter, 90.0 % waves preserved. |
+| `live_sigma` | `0` | Continuous threshold self-reinforcement: with `> 0`, both thresholds are re-derived every `feed()` as `pos = live_sigma × variance_ema`. Tracks jumps of the ambient noise floor without re-calibration. Verified: 16× noise jump → 1530 false beats (fixed) vs 4 (`live_sigma = 3`). |
+
+The two options are combinable and independent of `begin()` / `calibrate()` / `setThresholds()`.
+
+```cpp
+// v2.0 behavior, bit-for-bit
+qsetun.configure();
+
+// Quiet trit chatter around the boundary (hold band ≈ 47 raw units)
+qsetun.configure(12000, 0);
+
+// Make thresholds follow the noise floor continuously (3-sigma style)
+qsetun.configure(0, 3);
+
+// Both
+qsetun.configure(12000, 3);
+```
+
+`configure()` does **not** reset baseline, variance or wave-tracking state.
+
+---
+
 ### `reset()` — Full State Reset
 
 ```cpp
@@ -206,11 +243,21 @@ Clears all internal state: baseline, variance, ring buffer, wave tracking, cycle
 ### Telemetry Getters
 
 ```cpp
-int16_t  getBaseline()    const;  // Current adaptive baseline (raw units, de-scaled from Q8)
-bool     isAnomaly()      const;  // Last anomaly flag
-uint8_t  getScorePct()    const;  // Last anomaly score 0..100
-float    getScore()       const;  // Last anomaly score 0.0..1.0
-uint32_t getCyclesCount() const;  // Total completed cycles
+int16_t  getBaseline()      const;  // Current adaptive baseline (raw units, de-scaled from Q8)
+bool     isAnomaly()        const;  // Last anomaly flag
+uint8_t  getScorePct()      const;  // Last anomaly score 0..100
+float    getScore()         const;  // Last anomaly score 0.0..1.0
+uint32_t getCyclesCount()   const;  // Total completed cycles
+// v2.1 (parity with the lab fork)
+int32_t  getVarianceEMA()   const;  // Raw variance EMA (Q8)
+int32_t  getPosThreshold()  const;  // Current positive threshold (Q8)
+int32_t  getNegThreshold()  const;  // Current negative threshold (Q8)
+int16_t  getChargeLimit()   const;  // Current charge limit
+int32_t  getBaselineEMA()   const;  // Raw baseline EMA (Q8)
+const QTrit* getTritRing()  const;  // Pointer to the 32-trit ring buffer
+uint8_t  getRingHead()      const;  // Current ring head index
+void     setBaselineEMA(int32_t val);  // Seed baseline (Q8)
+void     setVarianceEMA(int32_t val);  // Seed variance (Q8)
 ```
 
 These return the **last computed** values. They don't trigger a new inference step.
@@ -219,7 +266,7 @@ These return the **last computed** values. They don't trigger a new inference st
 
 ## Memory Layout
 
-Total static footprint: **192 bytes**.
+Total static footprint: **84 bytes** (v2.1, measured with avr-g++ 7.3 on ATmega328P at `-Os`).
 
 ```
 ┌─────────────────────────────────────┐
@@ -232,9 +279,10 @@ Total static footprint: **192 bytes**.
 │  Anomaly state + scores             │   7 bytes
 │  Last charge + last width           │   4 bytes
 │  Cycles count                       │   4 bytes
+│  Hysteresis + live_sigma  (v2.1)    │   3 bytes
+│  Wave energy + trit counter (v2.1)  │   6 bytes
 ├─────────────────────────────────────┤
-│  Total: ~76 bytes active state      │
-│  + alignment padding to 192 bytes   │
+│  Total: 84 bytes actual (v2.1)      │
 └─────────────────────────────────────┘
 ```
 

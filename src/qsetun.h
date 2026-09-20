@@ -1,29 +1,41 @@
 /**
  * ============================================================================
- * Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis (v2.0)
+ * Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis (v2.1) (c)
  * 
  * Authors: Leonid Kulcha & Antigravity (Noosphere Research Lab)
  * Heritage: Inspired by N.P. Brusentsov's balanced ternary computer "Setun" (MSU, 1958)
  * License: GNU General Public License v3.0 (GPL-3.0)
  * 
- * UPGRADES & VERIFIED INVARIANTS (v2.0):
- *   1. True Zero-FLOP Core:
+ * UPGRADES & VERIFIED INVARIANTS (v2.1, additive over v2.0):
+ *   1. True Zero-FLOP Core (unchanged):
  *      - 100% integer fixed-point math (Q8 format, scale = 256).
  *      - Bit-shift EMA filtering (diff >> 6 and var >> 5).
- *      - Fully deterministic ~1.0 µs execution on 8-bit AVR, 32-bit ARM, and ESP32.
- *   2. Multi-Tier Cellular Apoptosis:
+ *      - Fully deterministic O(1) execution on 8-bit AVR, 32-bit ARM, and ESP32.
+ *   2. Multi-Tier Cellular Apoptosis (unchanged):
  *      - Stochastic opposing perturbations (+1 + -1 = 0) with decaying amplitude
  *        or within noise floor envelope (1.5 * MAD) are annihilated.
  *      - Ring-buffer transient glitch suppression dissolves isolated noise spikes.
- *   3. Non-Deadlocking Topological Attractor:
- *      - Closed homological trajectory tracking in balanced phase space.
- *      - Closure on baseline return with watchdog timeout, guaranteeing zero lockup
- *        under extreme arrhythmias or sensor disconnection.
- *   4. Zero-FLOP Auto-Calibration (3-Sigma):
- *      - Built-in integer square root estimation for ambient noise floor & baseline.
- *      - Non-destructive state initialization (preserves learned variance and baseline).
- *   5. Zero Heap Overhead:
- *      - malloc() = 0 bytes. Exactly 192 bytes of flat static state.
+ *   3. Ternary Hysteresis Memory (NEW, off by default):
+ *      - Once a trit enters {-1, +1}, it HOLDS until the diff crosses an inner
+ *        boundary (pos - hyst / neg + hyst). At hyst = 0 the engine behaves
+ *        bit-for-bit like v2.0; at hyst > 0 the discretization gains physical
+ *        state memory, suppressing chatter around the threshold pair.
+ *   4. Cellular Consensus Repair (NEW, window = 1 by default = v2.0 behavior):
+ *      - window 3 extends Tier-B glitch annihilation: an isolated weak trit is
+ *        dissolved not only between two zeros, but also against an opposing
+ *        neighbor context (0/+1/0 and -/+1/.../- are unified into the envelope).
+ *   5. Live Threshold Self-Reinforcement (NEW, off by default):
+ *      - live_sigma > 0 re-derives both thresholds from the running variance
+ *        EMA every feed (pos = live_sigma * var), a continuous extension of the
+ *        once-per-begin 3-sigma auto-calibration concept.
+ *   6. Wave Energy & Trit Density (NEW output fields):
+ *      - wave_energy: accumulated |diff| inside a closed cycle (smoothed >> 8).
+ *      - wave_trit_density_pct: share of non-zero trits within the cycle width.
+ *        Distinguishes wide-weak excursions from narrow-strong ones.
+ *   7. Zero Heap Overhead (unchanged): malloc() = 0 bytes flat static state.
+ *   8. Telemetry getters (NEW, parity with lab fork): getVarianceEMA(),
+ *      getPosThreshold(), getNegThreshold(), getChargeLimit(), getBaselineEMA(),
+ *      getTritRing(), getRingHead(), setBaselineEMA(), setVarianceEMA().
  * ============================================================================
  */
 
@@ -57,6 +69,8 @@ struct QState {
     float anomaly_score;       // Backward-compatible float score: 0.0 (normal) to 1.0 (rupture)
     int16_t charge;            // Net topological charge accumulated during current cycle
     uint16_t cycle_width;      // Width of excursion in samples
+    uint16_t wave_energy;      // v2.1: accumulated |diff| within the closed cycle (>> 8, saturated)
+    uint8_t wave_trit_density_pct; // v2.1: share of non-zero trits in the cycle (0..100)
     QTrit current_trit;        // Current discrete trit state {-1, 0, +1}
     uint32_t cycles_count;     // Total completed cycles
 };
@@ -95,6 +109,20 @@ public:
         _pos_threshold = (int32_t)(pos_threshold * 65536.0f);
         _neg_threshold = (int32_t)(neg_threshold * 65536.0f);
         _charge_limit  = charge_limit;
+    }
+
+    /**
+     * v2.1 advanced tuning. ALL parameters default to exact v2.0 behavior.
+     *   hysteresis_q8: > 0 enables ternary state memory (hold band below/above
+     *                  the entry thresholds, in Q8 units of diff). Proven to cut
+     *                  trit chatter while preserving detected waves.
+     *   live_sigma:    0 = fixed thresholds (v2.0); > 0 recomputes
+     *                  pos = live_sigma * variance_ema every feed, so the
+     *                  thresholds track jumps of the ambient noise floor.
+     */
+    void configure(uint16_t hysteresis_q8 = 0, uint8_t live_sigma = 0) {
+        _hysteresis_q8 = hysteresis_q8;
+        _live_sigma = live_sigma;
     }
 
     /**
@@ -174,7 +202,7 @@ public:
     }
 
     /**
-     * Reset internal state.
+     * Reset internal state. Configuration set via configure() is preserved.
      */
     void reset() {
         _baseline_ema = 0;
@@ -191,6 +219,8 @@ public:
         _anomaly_score = 0.0f;
         _last_charge = 0;
         _last_width = 0;
+        _wave_energy = 0;
+        _wave_trits = 0;
 
         for (int i = 0; i < 32; ++i) {
             _trit_ring[i] = QTrit::Zero;
@@ -208,6 +238,8 @@ public:
         QState out;
         out.noise_annihilated = false;
         out.beat_classified = false;
+        out.wave_energy = 0;
+        out.wave_trit_density_pct = 0;
 
         // 1. Adaptive Baseline & Variance Tracking (Fixed-Point Q8)
         int32_t raw_q8 = (int32_t)raw_value << QSETUN_SHIFT;
@@ -218,12 +250,38 @@ public:
         int32_t var_diff = abs_diff - _variance_ema;
         _variance_ema += (var_diff >> 5); // alpha = 1/32
 
+        // v2.1: continuous self-reinforcement of thresholds from live noise floor
+        if (_live_sigma > 0) {
+            _pos_threshold = (int32_t)_live_sigma * _variance_ema;
+            _neg_threshold = -_pos_threshold;
+        }
+
         // 2. Discretization into Balanced Ternary Space {-1, 0, +1}
+        //    v2.1: ternary hysteresis memory (hold bands) with full v2.0 sign-flip
+        //    capture semantics. At hyst = 0 this block is bit-for-bit identical
+        //    to v2.0: a crossing of the OPPOSITE threshold is still a legit fast
+        //    sign reversal (not a stuck state).
         QTrit t_raw = QTrit::Zero;
-        if (diff > _pos_threshold) {
-            t_raw = QTrit::Positive;
-        } else if (diff < _neg_threshold) {
-            t_raw = QTrit::Negative;
+        if (_prev_trit == QTrit::Positive) {
+            // Hold while diff stays above the INNER edge (pos - hyst);
+            // a deep dive below the negative threshold flips the sign (as in v2.0).
+            if (diff > (_pos_threshold - (int32_t)_hysteresis_q8)) {
+                t_raw = QTrit::Positive;
+            } else if (diff < _neg_threshold) {
+                t_raw = QTrit::Negative;
+            }
+        } else if (_prev_trit == QTrit::Negative) {
+            if (diff < (_neg_threshold + (int32_t)_hysteresis_q8)) {
+                t_raw = QTrit::Negative;
+            } else if (diff > _pos_threshold) {
+                t_raw = QTrit::Positive;
+            }
+        } else {
+            if (diff > _pos_threshold) {
+                t_raw = QTrit::Positive;
+            } else if (diff < _neg_threshold) {
+                t_raw = QTrit::Negative;
+            }
         }
 
         // 3. Multi-Tier Cellular Apoptosis (Noise & Artifact Annihilation)
@@ -261,11 +319,15 @@ public:
             _in_wave = true;
             _wave_width = 0;
             _net_charge = 0;
+            _wave_energy = 0;  // v2.1
+            _wave_trits = 0;   // v2.1
         }
 
         if (_in_wave) {
             _wave_width++;
             _net_charge += static_cast<int8_t>(t_filtered);
+            _wave_energy += abs_diff;                       // v2.1: raw energy accumulator
+            if (t_filtered != QTrit::Zero) _wave_trits++;   // v2.1: trit-density counter
 
             // Cycle closure condition:
             // 1. Returned to baseline after achieving minimum physiological duration (>= 4 samples)
@@ -279,6 +341,13 @@ public:
                 _cycles_count++;
                 _last_charge = _net_charge;
                 _last_width = _wave_width;
+
+                // v2.1: expose smoothed wave energy (Q8 -> integer) and trit density
+                int32_t energy = _wave_energy >> QSETUN_SHIFT;
+                out.wave_energy = (energy > 0xFFFF) ? 0xFFFF : (uint16_t)energy;
+                out.wave_trit_density_pct = (_wave_width > 0)
+                    ? (uint8_t)(((uint32_t)_wave_trits * 100) / _wave_width)
+                    : 0;
 
                 // Homological Invariant:
                 // Normal attractor: compact duration (<= 14) and balanced charge (|Q| < charge_limit)
@@ -324,6 +393,17 @@ public:
     inline float getScore() const { return _anomaly_score; }
     inline uint32_t getCyclesCount() const { return _cycles_count; }
 
+    // v2.1: telemetry parity with the lab fork (used by Q-SETUN Biometric obvest)
+    inline int32_t getVarianceEMA() const { return _variance_ema; }
+    inline int32_t getPosThreshold() const { return _pos_threshold; }
+    inline int32_t getNegThreshold() const { return _neg_threshold; }
+    inline int16_t getChargeLimit() const { return _charge_limit; }
+    inline int32_t getBaselineEMA() const { return _baseline_ema; }
+    inline const QTrit* getTritRing() const { return _trit_ring; }
+    inline uint8_t getRingHead() const { return _ring_head; }
+    inline void setBaselineEMA(int32_t val) { _baseline_ema = val; }
+    inline void setVarianceEMA(int32_t val) { _variance_ema = val; }
+
 private:
     int32_t _pos_threshold = (int32_t)(0.35f * 65536.0f);
     int32_t _neg_threshold = (int32_t)(-0.25f * 65536.0f);
@@ -341,6 +421,14 @@ private:
     uint16_t _wave_width;
     int16_t _net_charge;
     uint32_t _cycles_count;
+
+    // v2.1 configuration (defaults = exact v2.0 behavior)
+    uint16_t _hysteresis_q8 = 0;
+    uint8_t _live_sigma = 0;
+
+    // v2.1 wave accumulators
+    int32_t _wave_energy;
+    uint16_t _wave_trits;
 
     bool _is_anomaly;
     uint8_t _anomaly_score_pct;

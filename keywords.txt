@@ -19,11 +19,21 @@ feed	KEYWORD2
 reset	KEYWORD2
 calibrate	KEYWORD2
 setThresholds	KEYWORD2
+configure	KEYWORD2
 getBaseline	KEYWORD2
 isAnomaly	KEYWORD2
 getScore	KEYWORD2
 getScorePct	KEYWORD2
 getCyclesCount	KEYWORD2
+getVarianceEMA	KEYWORD2
+getPosThreshold	KEYWORD2
+getNegThreshold	KEYWORD2
+getChargeLimit	KEYWORD2
+getBaselineEMA	KEYWORD2
+getTritRing	KEYWORD2
+getRingHead	KEYWORD2
+setBaselineEMA	KEYWORD2
+setVarianceEMA	KEYWORD2
 
 #######################################
 # Constants and Literals (LITERAL1)
@@ -39,3 +49,5 @@ anomaly_score_pct	LITERAL1
 charge	LITERAL1
 cycle_width	LITERAL1
 noise_annihilated	LITERAL1
+wave_energy	LITERAL1
+wave_trit_density_pct	LITERAL1

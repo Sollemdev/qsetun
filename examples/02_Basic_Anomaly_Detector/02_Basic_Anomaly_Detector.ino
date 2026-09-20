@@ -3,7 +3,7 @@
  * QSetun Example 02: Universal Sensor Anomaly Detector
  * 
  * Works on ANY board: Arduino Uno, Nano, Mega, STM32, ESP32, ESP8266, RP2040.
- * Memory footprint: 192 bytes RAM, 0 bytes heap (malloc = 0).
+ * Memory footprint: 84 bytes RAM, 0 bytes heap (malloc = 0).
  * Speed: ~1.0 us per sample.
  * ============================================================================
  */

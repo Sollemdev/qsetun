@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-09-20 07:34:03",
+  "version": "2.1.0",
+  "test_a_legacy_equivalence": {
+    "passed": true,
+    "samples": 104096,
+    "mismatches": 0
+  },
+  "test_b1_hysteresis": {
+    "passed": true,
+    "legacy_transitions": 5740,
+    "hyst_transitions": 3770,
+    "legacy_waves": 767,
+    "hyst_waves": 690
+  },
+  "test_b3_live_sigma": {
+    "passed": true,
+    "legacy_beats": 1530,
+    "legacy_anomalies": 4,
+    "live_beats": 4,
+    "live_anomalies": 1
+  },
+  "test_b4_energy_density": {
+    "passed": true,
+    "strong": {
+      "wave_energy": 39251,
+      "density": 100,
+      "width": 48
+    },
+    "weak": {
+      "wave_energy": 16496,
+      "density": 100,
+      "width": 48
+    }
+  },
+  "overall_verdict": "ALL PASS"
+}

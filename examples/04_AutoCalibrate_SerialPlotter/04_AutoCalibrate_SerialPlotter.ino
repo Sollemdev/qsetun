@@ -11,7 +11,7 @@
  *   Line 2: Anomaly score (0 = normal, 98 = anomaly)
  *   Line 3: Trit state × 50 (for visibility: -50, 0, +50)
  * 
- * Memory: 192 bytes RAM core + ~200 bytes stack. malloc = 0.
+ * Memory: 84 bytes RAM core + ~200 bytes stack. malloc = 0.
  * ============================================================================
  */
 

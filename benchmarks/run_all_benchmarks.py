@@ -119,11 +119,15 @@ int main() {
 # 2. LATENCY, THROUGHPUT & DETERMINISM BENCHMARK (100,000 SAMPLES)
 # =============================================================================
 class PyQSetunEngine:
-    """Exact python mirror of the C++ QSetun v2.0 Q8 integer fixed-point engine."""
-    def __init__(self, pos_thresh=0.35, neg_thresh=-0.25, charge_limit=6):
+    """Exact python mirror of the C++ QSetun v2.1 Q8 integer fixed-point engine.
+    Defaults reproduce v2.0 behavior bit-for-bit (configure is additive)."""
+    def __init__(self, pos_thresh=0.35, neg_thresh=-0.25, charge_limit=6,
+                 hysteresis_q8=0, live_sigma=0):
         self.pos_threshold = int(pos_thresh * 65536)
         self.neg_threshold = int(neg_thresh * 65536)
         self.charge_limit = charge_limit
+        self.hysteresis_q8 = hysteresis_q8
+        self.live_sigma = live_sigma
         self.reset()
 
     def reset(self):
@@ -140,6 +144,8 @@ class PyQSetunEngine:
         self.is_anomaly = False
         self.anomaly_score_pct = 0
         self.anomaly_score = 0.0
+        self.wave_energy = 0
+        self.wave_trits = 0
 
     def feed(self, raw_value: int) -> Dict:
         raw_q8 = raw_value << 8
@@ -150,12 +156,34 @@ class PyQSetunEngine:
         var_diff = abs_diff - self.variance_ema
         self.variance_ema += (var_diff >> 5)
 
-        if diff > self.pos_threshold:
-            t_raw = 1
-        elif diff < self.neg_threshold:
-            t_raw = -1
+        # v2.1: live threshold self-reinforcement from the noise floor
+        if self.live_sigma > 0:
+            self.pos_threshold = self.live_sigma * self.variance_ema
+            self.neg_threshold = -self.pos_threshold
+
+        # v2.1: ternary hysteresis memory (hold bands) with full v2.0 sign-flip
+        # capture semantics. hyst = 0 is bit-for-bit v2.0 (thresholds only).
+        if self.prev_trit == 1:
+            if diff > (self.pos_threshold - self.hysteresis_q8):
+                t_raw = 1
+            elif diff < self.neg_threshold:
+                t_raw = -1
+            else:
+                t_raw = 0
+        elif self.prev_trit == -1:
+            if diff < (self.neg_threshold + self.hysteresis_q8):
+                t_raw = -1
+            elif diff > self.pos_threshold:
+                t_raw = 1
+            else:
+                t_raw = 0
         else:
-            t_raw = 0
+            if diff > self.pos_threshold:
+                t_raw = 1
+            elif diff < self.neg_threshold:
+                t_raw = -1
+            else:
+                t_raw = 0
 
         t_filtered = t_raw
         noise_annihilated = False
@@ -177,14 +205,21 @@ class PyQSetunEngine:
         self.ring_head = (self.ring_head + 1) & 31
 
         beat_classified = False
+        wave_energy_out = 0
+        wave_density_out = 0
         if t_filtered == 1 and not self.in_wave:
             self.in_wave = True
             self.wave_width = 0
             self.net_charge = 0
+            self.wave_energy = 0
+            self.wave_trits = 0
 
         if self.in_wave:
             self.wave_width += 1
             self.net_charge += t_filtered
+            self.wave_energy += abs_diff
+            if t_filtered != 0:
+                self.wave_trits += 1
 
             baseline_closed = (t_filtered == 0 and self.wave_width >= 4)
             watchdog_timeout = (self.wave_width >= 48)
@@ -193,6 +228,9 @@ class PyQSetunEngine:
                 self.in_wave = False
                 beat_classified = True
                 self.cycles_count += 1
+
+                wave_energy_out = min(self.wave_energy >> 8, 0xFFFF)
+                wave_density_out = ((self.wave_trits * 100) // self.wave_width) if self.wave_width > 0 else 0
 
                 abs_charge = abs(self.net_charge)
                 if self.wave_width > 14 or abs_charge >= self.charge_limit or watchdog_timeout:
@@ -211,7 +249,9 @@ class PyQSetunEngine:
             "anomaly_score_pct": self.anomaly_score_pct,
             "charge": self.net_charge,
             "width": self.wave_width,
-            "noise_annihilated": noise_annihilated
+            "noise_annihilated": noise_annihilated,
+            "wave_energy": wave_energy_out,
+            "wave_trit_density_pct": wave_density_out
         }
 
 

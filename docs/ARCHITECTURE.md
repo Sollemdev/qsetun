@@ -80,9 +80,33 @@ This is the core Brusentsov insight: three states with natural symmetry around z
 
 **Asymmetric thresholds** allow modeling signals where positive excursion (e.g., ECG R-peak) has different amplitude than negative (S-dip).
 
+### v2.1: Ternary Hysteresis Memory & Live Thresholds (Optional)
+
+Two opt-in extensions keep the v2.0 pipeline untouched **unless configured**:
+
+1. **Hysteresis hold bands** (`configure(hysteresis_q8)`): when a trit is in `+1`, it is *remembered* and held while `diff` stays above the inner edge `pos − hyst` (mirror: `−1` held while `diff < neg + hyst`). Only a crossing of the *opposite* threshold still flips the sign instantly — exactly the v2.0 fast-capture semantics. At `hyst = 0` the branch is bit-for-bit v2.0:
+
+```
+state +1:  diff > (pos − hyst)  → +1   (hold)
+           diff < neg           → −1   (fast flip, v2.0 capture)
+           otherwise            →  0
+state −1:  diff < (neg + hyst)  → −1   (hold)
+           diff > pos           → +1   (fast flip)
+           otherwise            →  0
+idle:      diff > pos           → +1
+           diff < neg           → −1
+           otherwise            →  0
+```
+
+2. **Live threshold self-reinforcement** (`configure(live_sigma)`): after the variance EMA update, both thresholds are re-derived every sample as `pos = live_sigma × variance_ema`. This is the 3-sigma calibration idea turned continuous — the engine keeps pace with a rising/falling noise floor instead of waiting for the next `calibrate()`.
+
+Both options add **zero** floating-point and **zero** heap; they only cost a few integer ops and 9 bytes of state.
+
 ---
 
 ## Stage 3: Cellular Apoptosis
+
+*(Untouched in v2.1 — the annihilation cascade below is bit-for-bit identical to v2.0.)*
 
 Biological inspiration: in living organisms, damaged cells self-destruct (apoptosis) to protect the organism. Q-SETUN applies the same principle to noise.
 
@@ -163,11 +187,22 @@ NORMAL  if:  width ≤ 14  AND |net_charge| <  charge_limit
 
 **Intuition:** A normal cycle is compact (short duration) and balanced (equal positive and negative trits → net charge near zero). An anomalous cycle is either too long, too asymmetric, or forcibly closed by the watchdog.
 
+### v2.1: Wave Energy & Trit Density
+
+While in wave, the engine additionally accumulates:
+
+```
+wave_energy += |diff|        // raw energetic content of the excursion (int32_t, Q8)
+wave_trits  += (trit ≠ 0)    // non-zero trit counter
+```
+
+On cycle closure these are exposed as `QState.wave_energy` (smoothed `>> 8`, saturated) and `QState.wave_trit_density_pct` (`100 × wave_trits / width`). They add a *shape dimension* to the binary normal/anomaly verdict: a narrow-strong spike and a wide-weak drift can carry the same charge yet differ sharply in energy and density — which matters for tremor/force-scale biometrics.
+
 ---
 
 ## Memory Layout
 
-Total: **192 bytes** (including alignment padding). Zero heap.
+Total: **84 bytes** (v2.1; actual, measured with avr-g++ 7.3 `-Os` on ATmega328P). Zero heap.
 
 ```
 Offset  Size  Field
@@ -190,7 +225,12 @@ Offset  Size  Field
 0x43     4    _anomaly_score (float)
 0x47     2    _last_charge   (int16_t)
 0x49     2    _last_width    (uint16_t)
-───── ~76 bytes active + alignment padding to 192 ─────
+─────── v2.1 additions (schematic offsets) ───────
+       2    _hysteresis_q8  (uint16_t)
+       1    _live_sigma     (uint8_t)
+       4    _wave_energy    (int32_t, Q8)
+       2    _wave_trits     (uint16_t)
+───── 84 bytes actual (v2.1) ─────
 ```
 
 ---
@@ -200,7 +240,7 @@ Offset  Size  Field
 | Property | Q-SETUN | TFLite Micro CNN |
 |:--|:--|:--|
 | Operations per sample | ~20 integer ops | ~50,000 MAC ops |
-| Memory model | Flat static 192 B | TensorArena 24+ KB |
+| Memory model | Flat static 84 B | TensorArena 24+ KB |
 | Determinism | Bit-exact O(1) | Data-dependent branching |
 | Noise handling | Built-in apoptosis | Must be in training data |
 | Interpretability | Every trit is explainable | Black-box weights |

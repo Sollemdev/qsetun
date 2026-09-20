@@ -39,7 +39,7 @@ Q-SETUN v2.0 is a deterministic neuromorphic Edge AI core based on Nikolai Bruse
                            +-------------------------------------+
                                               |
                                               v
-                           Diagnostic Output (QState: O(1), 192 B)
+                           Diagnostic Output (QState: O(1), 84 B)
 ```
 
 ---
@@ -53,10 +53,10 @@ All physical benchmarks were compiled using actual target cross-compilers (`avr-
 | **Inference Latency (ESP32)** | **1.0 µs** | 270.0 µs | *N/A (ARM only)* | ~180.0 µs | **270x Faster ⚡** |
 | **P99 Tail Latency** | **1.5 µs** | 315.0 µs | 95.0 µs (Cortex-M4) | 210.0 µs | **Hard Real-Time Determinism** |
 | **Dynamic Heap Allocation** | **0 Bytes (`malloc = 0`)** | 24,576 Bytes (`TensorArena`) | 8,192 Bytes | 16,384 Bytes | **Zero Heap Fragmentation** |
-| **Static RAM Footprint (AVR)** | **75 Bytes (.bss)** | *N/A (Exceeds RAM)* | *N/A (ARM only)* | *N/A (Exceeds RAM)* | **Runs on 2 KB Uno** |
-| **Flash Binary Footprint (AVR)** | **1,238 Bytes (.text)** | *N/A (Exceeds Flash)* | *N/A (ARM only)* | *N/A (Exceeds Flash)* | **3.8% of 32 KB Flash** |
+| **Static RAM Footprint (AVR)** | **84 Bytes (.bss)** | *N/A (Exceeds RAM)* | *N/A (ARM only)* | *N/A (Exceeds RAM)* | **Runs on 2 KB Uno** |
+| **Flash Binary Footprint (AVR)** | **1,758 Bytes (.text)** | *N/A (Exceeds Flash)* | *N/A (ARM only)* | *N/A (Exceeds Flash)* | **5.4% of 32 KB Flash** |
 | **Silicon Temperature (ESP32)** | **33.3°C** | 35.0°C | 34.1°C | 34.6°C | **Cold Silicon (-1.7°C)** |
-| **Minimum RAM Requirement** | **192 Bytes** | 24,576 Bytes | 8,192 Bytes | 16,384 Bytes | **Runs on 8-bit AVR (Uno)** |
+| **Minimum RAM Requirement** | **84 Bytes** | 24,576 Bytes | 8,192 Bytes | 16,384 Bytes | **Runs on 8-bit AVR (Uno)** |
 | **AAMI EC57 F1-Score** | **1.0000** | 0.9120 | 0.9250 | 0.9300 | **Topological Robustness** |
 | **Arithmetic Type** | **Integer Fixed-Point (Q8)** | Float32 / Int8 Quantized | Int8 Quantized | Int8 Quantized | **Zero-FLOP** |
 

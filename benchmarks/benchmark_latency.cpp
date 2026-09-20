@@ -100,7 +100,7 @@ void run_latency_benchmark() {
     std::cout << "P99 Latency:          " << p99_ns << " ns (Hard Real-Time Guarantee)" << std::endl;
     std::cout << "Max Tail Latency:     " << max_ns << " ns" << std::endl;
     std::cout << "Throughput:           " << (1000000000.0 / avg_ns) << " samples/sec" << std::endl;
-    std::cout << "Static RAM Footprint: 192 bytes (malloc = 0)" << std::endl;
+    std::cout << "Static RAM Footprint: " << sizeof(QSetun) << " bytes (malloc = 0)" << std::endl;
     std::cout << "=================================================" << std::endl;
 #endif
 }

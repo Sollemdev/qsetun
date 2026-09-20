@@ -8,7 +8,7 @@
 [![Speed: 1.0 us](https://img.shields.io/badge/Latency-1.0_μs_(270x_Faster)-orange.svg)]()
 [![Hardware: ESP32 / STM32 / AVR](https://img.shields.io/badge/Hardware-ESP32_|_STM32_|_AVR_|_RP2040-purple.svg)]()
 [![AAMI EC57 Benchmarks](https://img.shields.io/badge/AAMI_EC57-F1:_1.0000_(100%25)-brightgreen.svg)](docs/BENCHMARKS.md)
-[![Release: v2.0.0](https://img.shields.io/badge/Release-v2.0.0-blue.svg)](https://github.com/Sollemdev/qsetun/releases/tag/v2.0.0)
+[![Release: v2.1.0](https://img.shields.io/badge/Release-v2.1.0-blue.svg)](https://github.com/Sollemdev/qsetun/releases/tag/v2.1.0)
 
 ---
 
@@ -32,7 +32,7 @@ In 1958 at Moscow State University, **Nikolai Petrovich Brusentsov** designed an
 
 | Classic TinyML (e.g. TensorFlow Lite Micro) | Q-SETUN Neuromorphic Core |
 | :--- | :--- |
-| **High Memory Overhead:** Requires large `TensorArena` buffers (24 KB – 150 KB RAM). SRAM exhaustion causes immediate heap crashes (`OOM`). | **0 Bytes Dynamic Allocation (`malloc = 0`).** The entire core executes within **192 bytes** of flat static state. |
+| **High Memory Overhead:** Requires large `TensorArena` buffers (24 KB – 150 KB RAM). SRAM exhaustion causes immediate heap crashes (`OOM`). | **0 Bytes Dynamic Allocation (`malloc = 0`).** The entire core executes within **84 bytes** of flat static state. |
 | **High Latency & Power:** Millions of `float32` MAC operations take 60–270 μs, causing thermal throttling and battery drain. | **1.0 μs Deterministic Latency** (up to 1,000,000 inferences/sec). Silicon runs cool (33.3°C). |
 | **Noise Vulnerability:** High-frequency electrical/EMG noise perturbs dense weights, leading to false positives. | **Cellular Apoptosis:** Opposing high-frequency stochastic jitter self-annihilates: $(+1) + (-1) \equiv 0$. |
 | **Window Boundary Slicing:** Rigid sliding windows (e.g., 32–128 samples) bisect signals and miss transient anomalies. | **Topological Attractor:** Continuous phase-space tracking. Net charge burst ($Q \ge 6$) detects anomalies instantly. |
@@ -50,7 +50,7 @@ Measured on actual `ESP32-D0WDQ6-V3` silicon (COM3) running a continuous clinica
 | **Heap Allocation (`malloc`)** | **24,576 bytes** (`TensorArena`) | **0 bytes (`malloc = 0`)** | **Zero fragmentation** |
 | **Free Heap on ESP32** | **291 KB** | **321 KB** | **+30 KB free** for UI/WiFi |
 | **Silicon Temperature** | **35.0°C** | **33.3°C** | **Cold silicon (-1.7°C)** |
-| **Supported Hardware Class** | 32-bit MCUs ($\ge 32\text{ KB}$ RAM) | 8-bit AVR, 32-bit ARM, ESP32 ($\ge 192\text{ B}$ RAM) | **Runs on 2 KB Uno** |
+| **Supported Hardware Class** | 32-bit MCUs ($\ge 32\text{ KB}$ RAM) | 8-bit AVR, 32-bit ARM, ESP32 ($\ge 84\text{ B}$ RAM) | **Runs on 2 KB Uno** |
 | **Arrhythmia Detection (Beat #03)** | `Score: 0.138` (**MISSED**) | `Score: 0.980` (**DETECTED**) | **100% Accuracy** |
 | **Noise Annihilation (GPIO 0)** | Signal jitter, false alarm risk | **Annihilated $(+1) + (-1) \to 0$** | **100% Noise rejection** |
 

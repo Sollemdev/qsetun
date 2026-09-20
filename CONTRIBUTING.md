@@ -46,7 +46,7 @@ These architectural guarantees must hold for **every** commit:
 | **Zero heap** | No `malloc`, `new`, `std::vector`, or any dynamic allocation |
 | **O(1) execution** | No loops, recursion, or data-dependent branching in `feed()` |
 | **Single header** | The entire library is `src/qsetun.h` — no `.cpp` files |
-| **192-byte footprint** | Static state must not exceed 192 bytes |
+| **84-byte footprint** | Static state must not exceed 84 bytes |
 | **Cross-platform** | Must compile on 8-bit AVR (ATmega328P), 32-bit ARM, and ESP32 |
 
 ### Verification
