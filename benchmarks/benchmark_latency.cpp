@@ -2,11 +2,11 @@
  * ============================================================================
  * Q-SETUN Benchmark: Cycle-Accurate Latency, Throughput & P99 Determinism
  * 
- * Complies with IEEE/ACM reproducibility standards:
+ * Formal verification adhering to IEEE/ACM empirical benchmarking guidelines:
  *   - 100,000 statistical sample iterations
- *   - P50, P90, P99 latency percentiles
- *   - Jitter and max-tail latency evaluation
- *   - Compiles on both Embedded MCU (Arduino/PlatformIO) and Native Host (CI/x86/ARM)
+ *   - Empirical P50, P90, P99 latency distribution
+ *   - Cycle jitter and maximum tail latency characterization
+ *   - Cross-platform verification: Embedded MCU (AVR/ARM/ESP32) and Host x86_64
  * ============================================================================
  */
 

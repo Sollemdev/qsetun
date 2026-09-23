@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
 ===============================================================================
-Q-SETUN v2.0: Complete Empirical Benchmark & Hardware Verification Suite
+Q-SETUN v2.1: Complete Empirical Benchmark & Hardware Verification Suite
 ===============================================================================
 Authors: Leonid Kulcha & Antigravity (Noosphere Research Lab)
 Heritage: Nikolai Brusentsov's Setun (1958)
 License: GNU General Public License v3.0 (GPL-3.0)
 
-Executes LIVE and generates genuine, non-fabricated physical evidence:
-  1. Real Hardware Flash & RAM compilation via avr-gcc / avr-size
-  2. Nanosecond-accurate Latency, Throughput, Jitter & P99 Determinism (100k samples)
-  3. ANSI/AAMI EC57 Clinical Arrhythmia Detection Accuracy (Beat-by-Beat)
-  4. 4 Environmental Physical Stress Tests (Wander, EMG Noise, Disconnect, Amplitude)
+Executes live verification protocols with empirical telemetry:
+  1. Real hardware flash and static RAM footprint via avr-gcc / avr-size
+  2. Nanosecond-accurate latency, throughput, jitter, and P99 determinism (100k samples)
+  3. ANSI/AAMI EC57 clinical arrhythmia detection validation (beat-by-beat)
+  4. Environmental physical stress testing (baseline wander, EMG noise, lead disconnect, amplitude jitter)
 ===============================================================================
 """
 
