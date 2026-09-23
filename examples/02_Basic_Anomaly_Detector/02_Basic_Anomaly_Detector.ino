@@ -1,10 +1,10 @@
 /**
  * ============================================================================
- * QSetun Example 02: Universal Sensor Anomaly Detector
+ * Q-SETUN Example 02: Universal Sensor Anomaly Detector
  * 
- * Works on ANY board: Arduino Uno, Nano, Mega, STM32, ESP32, ESP8266, RP2040.
- * Memory footprint: 84 bytes RAM, 0 bytes heap (malloc = 0).
- * Speed: ~1.0 us per sample.
+ * Hardware Compatibility: 8-bit AVR (ATmega328P), 32-bit ARM Cortex-M, ESP32/ESP8266, RP2040.
+ * Invariants: Deterministic O(1) execution (~1.0 μs/sample), 84 bytes static RAM, malloc = 0.
+ * Theory: Continuous phase-space tracking with Brusentsov ternary quantization {-1, 0, +1}.
  * ============================================================================
  */
 

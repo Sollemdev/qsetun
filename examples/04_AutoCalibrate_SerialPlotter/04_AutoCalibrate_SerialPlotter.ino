@@ -1,17 +1,10 @@
 /**
  * ============================================================================
- * QSetun Example 04: Auto-Calibration + Serial Plotter
+ * Q-SETUN Example 04: Empirical Auto-Calibration and Telemetry Serial Plotter
  * 
- * ZERO WIRING REQUIRED. Runs on ANY board (Uno, Nano, ESP32, STM32, RP2040).
- * Generates a synthetic clean signal, auto-calibrates from ambient noise,
- * then periodically injects noise bursts and anomaly spikes.
- * 
- * Open Arduino Serial Plotter (Ctrl+Shift+L) at 115200 baud to see:
- *   Line 1: Raw signal value
- *   Line 2: Anomaly score (0 = normal, 98 = anomaly)
- *   Line 3: Trit state × 50 (for visibility: -50, 0, +50)
- * 
- * Memory: 84 bytes RAM core + ~200 bytes stack. malloc = 0.
+ * Target Architectures: AVR (ATmega328P), ARM Cortex-M0+/M4, ESP32-D0WDQ6, RP2040.
+ * Invariants: Deterministic O(1) latency (~1.0 μs/sample), 84 bytes static RAM, zero dynamic allocation.
+ * Visualization: Real-time phase-space trajectories and cellular apoptosis via Arduino Serial Plotter (115200 baud).
  * ============================================================================
  */
 
