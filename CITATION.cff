@@ -3,11 +3,11 @@ message: "If you use this software in academic or industrial research, please ci
 authors:
   - family-names: "Kulcha"
     given-names: "Leonid"
-    affiliation: "Noosphere Research Lab"
+    affiliation: "Noosphere Research Laboratory"
   - family-names: "Antigravity"
     given-names: "Architecture Co-Author"
-    affiliation: "Noosphere Research Lab"
-title: "Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis for Edge AI"
+    affiliation: "Noosphere Research Laboratory"
+title: "Q-SETUN: Brusentsov Balanced Ternary Neuromorphic Core with Cellular Apoptosis for Edge Intelligence"
 version: 2.1.0
 doi: 10.5281/zenodo.22813548
 date-released: 2026-09-20
