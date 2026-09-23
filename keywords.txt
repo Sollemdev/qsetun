@@ -1,5 +1,6 @@
 #######################################
-# Syntax Coloring Map For QSetun
+# Syntax Coloring Map For Q-SETUN (Arduino IDE)
+# Brusentsov Balanced Ternary Signal Core
 #######################################
 
 #######################################

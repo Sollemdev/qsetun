@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
   "name": "QSetun",
   "version": "2.1.0",
-  "description": "Integer-only neuromorphic Edge AI using Brusentsov balanced ternary qutrits and cellular apoptosis. Zero floating-point: 100% integer arithmetic, zero-malloc signal processing engine for microcontrollers.",
+  "description": "Deterministic zero-FLOP neuromorphic edge intelligence using Brusentsov balanced ternary logic and cellular apoptosis. 100% integer arithmetic, zero dynamic allocation (malloc = 0) for embedded microcontrollers.",
   "keywords": [
     "neuromorphic-computing",
     "balanced-ternary",
