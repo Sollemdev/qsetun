@@ -1,7 +1,7 @@
-# Changelog
+# Q-SETUN Formal Release Chronicle & Verification Record
 
-All notable changes to Q-SETUN are documented in this file.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+All notable scientific and architectural developments of the Q-SETUN neuromorphic core are documented herein.
+Format adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
