@@ -1,6 +1,6 @@
-# Q-SETUN: Brusentsov Balanced Ternary Signal Core with Cellular Apoptosis
-> **Zero Floating-Point, Integer-Only Signal Intelligence for Microcontrollers.**  
-> *Empirically validated on silicon: 1.0 microsecond latency, 0 bytes dynamic heap allocation (`malloc = 0`), 100% integer arithmetic (0 FLOPs).*
+# Q-SETUN: Brusentsov Balanced Ternary Neuromorphic Core with Cellular Apoptosis
+> **Deterministic Zero-FLOP Signal Intelligence for Resource-Constrained Embedded Silicon.**  
+> *Empirically validated across 8-bit AVR, 32-bit ARM, and ESP32 architectures: 1.0 μs cycle latency, zero dynamic heap allocation (`malloc = 0`), flat 84-byte static RAM footprint, and 100% integer arithmetic.*
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22813548.svg)](https://doi.org/10.5281/zenodo.22813548)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
