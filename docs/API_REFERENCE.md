@@ -1,7 +1,7 @@
-# Q-SETUN API Reference
-
-> Complete reference for `qsetun.h` v2.1.0
-> All methods are `O(1)` time, `0` heap allocation, `0` floating-point operations in the core path.
+# Q-SETUN Formal API Reference & Specification
+ 
+> **Version:** 2.1.0  
+> **Complexity Guarantees:** Strict $\mathcal{O}(1)$ time complexity, $0$ dynamic heap allocation (`malloc = 0`), $100\%$ integer fixed-point arithmetic in the primary inference pathway.
 
 ---
 

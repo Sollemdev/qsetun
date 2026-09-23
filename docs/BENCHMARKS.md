@@ -1,4 +1,4 @@
-# Q-SETUN v2.0: Empirical Validation & Benchmark Methodology
+# Q-SETUN v2.1: Empirical Validation & Benchmark Methodology
 
 > **Authors:** Leonid Kulcha & Antigravity (Noosphere Research Lab)  
 > **Permanent Research Passport (CERN / Zenodo DOI):** [10.5281/zenodo.22813548](https://doi.org/10.5281/zenodo.22813548)  
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary: Silicon Invariants
 
-Q-SETUN v2.0 is a deterministic neuromorphic Edge AI core based on Nikolai Brusentsov's balanced ternary computer architecture (*Setun*, MSU 1958). It replaces matrix-vector multiplications ($W \cdot x + b$) and floating-point activation functions with **discrete balanced ternary phase-space attractors $\{-1, 0, +1\}$** and **cellular apoptosis**.
+Q-SETUN v2.1 is a deterministic neuromorphic Edge AI core based on Nikolai Brusentsov's balanced ternary computer architecture (*Setun*, MSU 1958). It replaces matrix-vector multiplications ($W \cdot x + b$) and floating-point activation functions with **discrete balanced ternary phase-space attractors $\{-1, 0, +1\}$** and **cellular apoptosis**.
 
 ```
                            +-------------------------------------+

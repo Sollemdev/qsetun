@@ -1,7 +1,7 @@
-# Q-SETUN Architecture
+# Q-SETUN Neuromorphic Architecture & Topological Attractors
 
-> Internal design of the Zero-FLOP balanced ternary inference engine.  
-> Read this if you want to understand **how** Q-SETUN works, not just **how to use** it.
+> **Theoretical Foundations:** Discrete ternary phase-space attractors, Brusentsov balanced logic ($\{-1, 0, +1\}$), and multi-tier cellular apoptosis for zero-FLOP edge intelligence.  
+> **Target Audience:** Microarchitecture researchers, neuromorphic systems engineers, and embedded firmware developers.
 
 ---
 
