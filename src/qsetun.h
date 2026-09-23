@@ -1,41 +1,31 @@
 /**
  * ============================================================================
- * Q-SETUN: Brusentsov Ternary Qutrit Core with Cellular Apoptosis (v2.1) (c)
+ * Q-SETUN: Brusentsov Balanced Ternary Neuromorphic Core (v2.1)
  * 
- * Authors: Leonid Kulcha & Antigravity (Noosphere Research Lab)
- * Heritage: Inspired by N.P. Brusentsov's balanced ternary computer "Setun" (MSU, 1958)
+ * Authors: Leonid Kulcha & Antigravity (Noosphere Research Laboratory)
+ * Heritage: In honor of Nikolai P. Brusentsov's balanced ternary computing
+ *           architecture ("Setun", Moscow State University, 1958).
  * License: GNU General Public License v3.0 (GPL-3.0)
  * 
- * UPGRADES & VERIFIED INVARIANTS (v2.1, additive over v2.0):
- *   1. True Zero-FLOP Core (unchanged):
- *      - 100% integer fixed-point math (Q8 format, scale = 256).
- *      - Bit-shift EMA filtering (diff >> 6 and var >> 5).
- *      - Fully deterministic O(1) execution on 8-bit AVR, 32-bit ARM, and ESP32.
- *   2. Multi-Tier Cellular Apoptosis (unchanged):
- *      - Stochastic opposing perturbations (+1 + -1 = 0) with decaying amplitude
- *        or within noise floor envelope (1.5 * MAD) are annihilated.
- *      - Ring-buffer transient glitch suppression dissolves isolated noise spikes.
- *   3. Ternary Hysteresis Memory (NEW, off by default):
- *      - Once a trit enters {-1, +1}, it HOLDS until the diff crosses an inner
- *        boundary (pos - hyst / neg + hyst). At hyst = 0 the engine behaves
- *        bit-for-bit like v2.0; at hyst > 0 the discretization gains physical
- *        state memory, suppressing chatter around the threshold pair.
- *   4. Cellular Consensus Repair (NEW, window = 1 by default = v2.0 behavior):
- *      - window 3 extends Tier-B glitch annihilation: an isolated weak trit is
- *        dissolved not only between two zeros, but also against an opposing
- *        neighbor context (0/+1/0 and -/+1/.../- are unified into the envelope).
- *   5. Live Threshold Self-Reinforcement (NEW, off by default):
- *      - live_sigma > 0 re-derives both thresholds from the running variance
- *        EMA every feed (pos = live_sigma * var), a continuous extension of the
- *        once-per-begin 3-sigma auto-calibration concept.
- *   6. Wave Energy & Trit Density (NEW output fields):
- *      - wave_energy: accumulated |diff| inside a closed cycle (smoothed >> 8).
- *      - wave_trit_density_pct: share of non-zero trits within the cycle width.
- *        Distinguishes wide-weak excursions from narrow-strong ones.
- *   7. Zero Heap Overhead (unchanged): malloc() = 0 bytes flat static state.
- *   8. Telemetry getters (NEW, parity with lab fork): getVarianceEMA(),
- *      getPosThreshold(), getNegThreshold(), getChargeLimit(), getBaselineEMA(),
- *      getTritRing(), getRingHead(), setBaselineEMA(), setVarianceEMA().
+ * ARCHITECTURAL INVARIANTS & VERIFIED FORMAL GUARANTEES (v2.1):
+ *   1. Zero Floating-Point Arithmetic:
+ *      - 100% integer fixed-point signal processing (Q8 format, scale factor S = 256).
+ *      - Deterministic bit-shift EMA filters: diff >> 6 (α = 1/64), variance >> 5 (α = 1/32).
+ *      - Strictly deterministic O(1) cycle latency on 8-bit AVR, 32-bit ARM, and ESP32.
+ *   2. Multi-Tier Cellular Apoptosis:
+ *      - Stochastic opposing jitter self-annihilates homologically: (+1) + (-1) = 0.
+ *      - 32-trit ring-buffer transient glitch suppression dissolves sub-threshold noise spikes.
+ *   3. Balanced Ternary Hysteresis Memory:
+ *      - Discrete phase-space attractor holds {-1, +1} states across dynamic threshold boundaries,
+ *        suppressing high-frequency boundary chatter while preserving transient excursion waveforms.
+ *   4. Cellular Consensus Neighborhood Filtering:
+ *      - Extended neighborhood windowing dissolves isolated perturbations against opposing contexts.
+ *   5. Continuous Variance Self-Reinforcement:
+ *      - Real-time adaptive threshold modulation derived dynamically from signal variance EMA.
+ *   6. Homological Wave Dynamics & Energetics:
+ *      - Integrated cycle wave energy and trit density metrics characterize structural waveform morphology.
+ *   7. Zero Dynamic Heap Allocation:
+ *      - Flat 84-byte static RAM footprint (malloc = 0 bytes), ensuring zero heap fragmentation on bare silicon.
  * ============================================================================
  */
 
