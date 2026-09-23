@@ -1,14 +1,16 @@
-# Contributing to Q-SETUN
+# Guidelines for Scientific Contributions & Empirical Peer Review
 
-Thank you for your interest in Q-SETUN! Contributions are welcome.
+Contributions to Q-SETUN are welcome from embedded systems engineers, microarchitecture researchers, and neuromorphic computing practitioners.
+To preserve the mathematical and architectural integrity of the core, all contributions undergo rigorous verification against verified silicon invariants.
 
 ---
 
-## Quick Links
+## Academic & Repository Resources
 
-- **Repository:** [github.com/Sollemdev/qsetun](https://github.com/Sollemdev/qsetun)
-- **License:** GPL-3.0
-- **Issues:** [GitHub Issues](https://github.com/Sollemdev/qsetun/issues)
+- **Primary Repository:** [github.com/Sollemdev/qsetun](https://github.com/Sollemdev/qsetun)
+- **Permanent Research Passport (Zenodo DOI):** [10.5281/zenodo.22813548](https://doi.org/10.5281/zenodo.22813548)
+- **License:** GNU General Public License v3.0 (GPL-3.0)
+- **Issue Tracking & RFCs:** [GitHub Issues](https://github.com/Sollemdev/qsetun/issues)
 
 ---
 
